@@ -97,6 +97,10 @@ public:
     --leaf.count;
     --header_.entryCount;
 
+    // Empty leaves remain linked after deletion. Compact when accumulated sparse
+    // pages make the tree much larger than the live data warrants.
+    const std::uint64_t usefulPages = header_.entryCount / (kOrder / 2) + 2;
+    if (nodes_.size() > 32 && nodes_.size() > usefulPages * 4) rebuild();
   }
 
   void find(const std::string &index) const {
